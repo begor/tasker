@@ -7,5 +7,8 @@ defmodule TaskerWeb.Router do
 
   scope "/api", TaskerWeb do
     pipe_through :api
+
+    post "/sort", TaskController, :sort
+    post "/bash", TaskController, :bash
   end
 end
