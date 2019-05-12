@@ -3,7 +3,7 @@ defmodule Tasker.Operations do
     result = tasks
     |> build_graph
     |> toposort
-    |> validate_graph
+    |> validate
     |> format_tasks
   end
 
@@ -48,9 +48,20 @@ defmodule Tasker.Operations do
     end
   end
 
-  defp validate_graph({graph, sorted_order, postvisit_map}) do
-    # TODO: check neighbors, check cycles
-    {:ok, graph, sorted_order}
+  defp validate({graph, sorted_order, postvisit_map}) do
+    is_acyclic = Enum.all?(
+      graph,
+      fn {node_name, node} -> 
+        my_postivisit = postvisit_map[node_name]
+        Enum.all?(node["requires"], fn req -> postvisit_map[req] < my_postivisit end)
+      end
+    )
+
+    if is_acyclic do
+      {:ok, graph, sorted_order}
+    else
+      {:error, "Detected cycle in tasks requires"}
+    end    
   end
 
   defp format_tasks({:ok, graph, sorted_order}) do
