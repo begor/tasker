@@ -1,0 +1,28 @@
+{
+  "tasks": [
+    {
+      "name": "task-1", 
+      "command": "cat 42",
+      "requires": ["task-3", "task-4"]
+    },
+    {
+      "name": "task-2", 
+      "requires": ["task-4"],
+      "command": "echo 'Hello!' > 42"
+    },
+    {
+      "name": "task-3",
+      "command": "cat 42 && echo 'Bye!' > 42",
+      "requires": ["task-4", "task-2"]
+    },
+    {
+      "name": "task-4", 
+      "command": "touch 42"
+    },
+    {
+      "name": "task-5",
+      "command": "rm 42",
+      "requires": ["task-1"]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "tasks": [
+    {
+      "name": "task-1", 
+      "command": "touch 42",
+      "requires": ["task-2"]
+    }
+  ]
+}

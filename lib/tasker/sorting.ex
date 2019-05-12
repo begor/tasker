@@ -1,4 +1,7 @@
-defmodule Tasker.Operations do
+defmodule Tasker.Sorting do
+  def sort(nil) do
+    {:error, "No tasks provided"}
+  end
   def sort(tasks) do
     graph = tasks
     |> build_graph
@@ -82,13 +85,13 @@ defmodule Tasker.Operations do
   end
 
   defp format_tasks({:ok, graph, sorted_order}) do
-    Enum.map(
+    {:ok, Enum.map(
       sorted_order,
       fn task_name -> 
         task = graph[task_name]
         %{"name" => task["name"], "command" => task["command"]}
       end
-    )
+    )}
   end
   defp format_tasks({:error, reason}) do
     {:error, reason}
