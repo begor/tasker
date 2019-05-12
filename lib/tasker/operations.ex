@@ -1,10 +1,13 @@
 defmodule Tasker.Operations do
   def sort(tasks) do
-    result = tasks
+    graph = tasks
     |> build_graph
-    |> toposort
-    |> validate
-    |> format_tasks
+    |> validate_graph
+
+    case graph do
+      {:ok, graph} -> graph |> toposort |> check_cycles |> format_tasks
+      err -> err
+    end
   end
 
   defp build_graph(tasks) do
@@ -12,6 +15,20 @@ defmodule Tasker.Operations do
     |> Enum.map(&Map.put_new(&1, "requires", []))
     |> Enum.map(fn task -> {task["name"], task} end) 
     |> Map.new
+  end
+
+  defp validate_graph(graph) do
+    failed_node = graph
+    |> Enum.drop_while(fn {node_name, node} -> 
+          Enum.all?(node["requires"], fn req -> req != node_name && Map.has_key?(graph, req) end)
+        end)
+    |> Enum.at(0)
+
+    if failed_node == nil do
+      {:ok, graph}
+    else 
+      {:error, "Invalid requires in task #{elem(failed_node, 0)}"}
+    end
   end
 
   defp toposort(graph) do
@@ -48,7 +65,7 @@ defmodule Tasker.Operations do
     end
   end
 
-  defp validate({graph, sorted_order, postvisit_map}) do
+  defp check_cycles({graph, sorted_order, postvisit_map}) do
     is_acyclic = Enum.all?(
       graph,
       fn {node_name, node} -> 
