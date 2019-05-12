@@ -69,18 +69,18 @@ defmodule Tasker.Sorting do
   end
 
   defp check_cycles({graph, sorted_order, postvisit_map}) do
-    is_acyclic = Enum.all?(
-      graph,
+    cycle_node = graph
+    |> Enum.drop_while(
       fn {node_name, node} -> 
         my_postivisit = postvisit_map[node_name]
         Enum.all?(node["requires"], fn req -> postvisit_map[req] < my_postivisit end)
-      end
-    )
+      end)
+    |> Enum.at(0)
 
-    if is_acyclic do
+    if cycle_node == nil do
       {:ok, graph, sorted_order}
     else
-      {:error, "Detected cycle in tasks requires"}
+      {:error, "Detected cycle in #{elem(cycle_node, 0)} requires"}
     end    
   end
 

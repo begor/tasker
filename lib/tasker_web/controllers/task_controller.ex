@@ -3,7 +3,7 @@ defmodule TaskerWeb.TaskController do
 
   def sort(conn, params) do
     case Tasker.Sorting.sort(params["tasks"]) do
-      {:ok, sorted_tasks} -> json(conn, %{"tasks" => sorted_tasks})
+      {:ok, sorted_tasks} -> json(conn, sorted_tasks)
       {:error, reason} -> conn |> put_status(400) |> json(%{"error" => reason})
     end
   end
